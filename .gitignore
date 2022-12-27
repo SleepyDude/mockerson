@@ -1,3 +1,5 @@
 .deta
 **/__pycache__
 venv
+experiments
+.env
