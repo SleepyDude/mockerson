@@ -3,3 +3,5 @@
 venv
 experiments
 .env
+.mypy_cache
+.pytest_cache
