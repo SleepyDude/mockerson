@@ -52,7 +52,7 @@ async def register_user(input_user: UserReg):
     # look for the user in database
     item = users_db.get(input_user.username.lower())
     if item is None:
-        hash_pass = bcrypt.hashpw(input_user.password_hash.encode('utf-8'), bcrypt.gensalt())
+        hash_pass = bcrypt.hashpw(input_user.password.encode('utf-8'), bcrypt.gensalt())
         u = User(
             username=input_user.username,
             password_hash=hash_pass

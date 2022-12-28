@@ -16,8 +16,8 @@ class User(BaseModel):
 
 class UserOut(BaseModel):
     username: str
-    endpoints: Optional[List[Endpoint]] = None
+    endpoints: Optional[List[Endpoint]] = ""
     
 class UserReg(BaseModel):
     username: str
-    password_hash: str
+    password: str
