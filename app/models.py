@@ -12,11 +12,11 @@ class Endpoint(BaseModel):
 class User(BaseModel):
     username: str
     password_hash: str
-    endpoints: Optional[List[Endpoint]] = ""
+    endpoints: Optional[List[Endpoint]] = []
 
 class UserOut(BaseModel):
     username: str
-    endpoints: Optional[List[Endpoint]] = ""
+    endpoints: Optional[List[Endpoint]] = []
     
 class UserReg(BaseModel):
     username: str
