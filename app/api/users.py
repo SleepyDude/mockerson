@@ -25,9 +25,9 @@ async def authentificate_user(username: str, password: str):
         user = await base.get(username.lower()) # lower username is my key
         if user is None:
             return False
-        if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
+        if not bcrypt.checkpw(password.encode('utf-8'), user[0]['password_hash'].encode('utf-8')):
             return False
-        return user
+        return user[0]
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     # So long as the oauth2_scheme somewhere in the dependency chain
@@ -39,12 +39,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         # users_db = await get_users_db()
         async with Deta() as d:
             base = d.base(DETA_USER_DB_TABLE)
-            user = await base.get(key=payload.get('username').lower())
-    except:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Invalid username or password'
-        )
+            # print('base:', base)
+            # print('username:', payload.get('username').lower())
+            user = await base.get(payload.get('username').lower())
+            
+        if user is None:
+            print('cant found user in database', user)
+        else:
+            user = user[0]
+    except Exception as e:
+        print('ERROR:', e)
+        # raise HTTPException(
+        #     status_code=status.HTTP_401_UNAUTHORIZED,
+        #     detail='Invalid username or password'
+        # )
     return User(**user)
 
 """
