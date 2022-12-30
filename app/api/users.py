@@ -8,7 +8,7 @@ import jwt
 # from app import db
 
 from ..config import JWT_SECRET, DETA_USER_DB_TABLE
-from ..models import User, UserOut, UserReg
+from ..models import User, UserOut, UserIn
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
@@ -22,16 +22,17 @@ async def authentificate_user(username: str, password: str):
     # users_db = await get_users_db()
     async with Deta() as d:
         base = d.base(DETA_USER_DB_TABLE)
-        user = await base.get(username.lower()) # lower username is my key
-        if user is None:
+        users = await base.get(username.lower()) # lower username is my key
+        if users is None:
             return False
-        if not bcrypt.checkpw(password.encode('utf-8'), user[0]['password_hash'].encode('utf-8')):
+        user = users[0]
+        if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
             return False
-        return user[0]
+        return user
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     # So long as the oauth2_scheme somewhere in the dependency chain
-    # We habe a lock here
+    # We have a lock here
     # Need to decode the token
     user = None
     try:
@@ -61,6 +62,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 @router.post('/token')
 async def generate_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    print('Got form data in /token:', form_data)
     # verify that the from_data is correct
     # form_data is gonna be the username and password
     user = await authentificate_user(form_data.username, form_data.password)
@@ -72,20 +74,21 @@ async def generate_token(form_data: OAuth2PasswordRequestForm = Depends()):
 
     token = jwt.encode(user, JWT_SECRET)
     return {'access_token': token, 'token_type': 'bearer'}
-    
-@router.post('/register_user')
-async def register_user(input_user: UserReg):
+
+@router.post('/user')
+async def register_user(input_user: UserIn):
+    print(input_user, 'tryin to register')
     async with Deta() as d:
         base = d.base(DETA_USER_DB_TABLE)
-        user = await base.get(input_user.username.lower())
+        users = await base.get(input_user.username.lower())
 
-    if user is None:
+    if users is None:
+        print('not found user in db')
         hash_pass = bcrypt.hashpw(input_user.password.encode('utf-8'), bcrypt.gensalt())
         u = User(
             username=input_user.username,
             password_hash=hash_pass
         )
-        resp = None
         async with Deta() as d:
             base = d.base(DETA_USER_DB_TABLE)
             resp = await base.put(
@@ -93,10 +96,22 @@ async def register_user(input_user: UserReg):
             )
         return {'Message': 'Registration success. Welcome, {}!'\
             .format(resp['processed']['items'][0]['username'])}
-    else:
-        return {'Message': 'Registration Failed. The user {} is already exists.'\
-            .format(input_user.username)}
+    print('before exception rising')
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail='Registration Failed. The user {} is already exists.'\
+            .format(input_user.username)
+    )
 
-@router.get('/users/me', response_model=UserOut)
-async def get_my_info(user: User = Depends(get_current_user)):
+@router.get('/user', response_model=UserOut)
+async def get_me(user: User = Depends(get_current_user)):
     return user
+
+@router.delete(
+    '/user',
+    status_code=status.HTTP_204_NO_CONTENT)
+async def delete_me(user: User = Depends(get_current_user)):
+    async with Deta() as d:
+        base = d.base(DETA_USER_DB_TABLE)
+        await base.delete(user.username.lower())
+    return None

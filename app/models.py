@@ -18,6 +18,6 @@ class UserOut(BaseModel):
     username: str
     endpoints: Optional[List[Endpoint]] = []
     
-class UserReg(BaseModel):
+class UserIn(BaseModel):
     username: str
     password: str
