@@ -4,11 +4,8 @@ from deta import Record, Deta
 import bcrypt
 import jwt
 
-# from ..db import users_db, deta
-# from app import db
-
 from ..config import JWT_SECRET, DETA_USER_DB_TABLE
-from ..models import User, UserOut, UserIn
+from ..models.users import User, UserOut, UserIn
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 

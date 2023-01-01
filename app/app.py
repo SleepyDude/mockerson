@@ -2,12 +2,13 @@ from fastapi import FastAPI
 
 from .api import root
 from .api import users
-# from .db import init_deta, shutdown_deta
+from .api import fake_data
 
 app = FastAPI()
 
 app.include_router(root.router)
 app.include_router(users.router)
+app.include_router(fake_data.router)
 
 # @app.on_event("startup")
 # async def startup_event():
