@@ -37,5 +37,6 @@ jobs:
     - name: Test with pytest
       env:
         DETA_PROJECT_KEY: ${{ secrets.DETA_PROJECT_KEY }}
+        JWT_SECRET: $ {{ secrets.JWT_SECRET }}
       run: |
         pytest
