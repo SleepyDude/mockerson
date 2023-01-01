@@ -40,3 +40,8 @@ jobs:
         JWT_SECRET: $ {{ secrets.JWT_SECRET }}
       run: |
         pytest
+    - name: Deploy on deta
+      uses: BogDAAAMN/deta-deploy-action@v1.0.1
+      with:
+        deta-access-token: ${{ secrets.DETA_PROJECT_KEY }}
+        deta-name: 'mockerson'
