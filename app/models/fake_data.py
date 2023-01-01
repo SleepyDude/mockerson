@@ -24,15 +24,8 @@ class QueryParams(BaseModel):
 
     @root_validator(pre=True)
     def check_shape(cls, v):
-        # print('checking combination of v: \n', v)
-        # print(type(v))
-        # print(v.get('size'))
-        # print(v.get('page'))
-        # print(v.get('begin'))
-        # print(v.get('end'))
         shape = [1 if i is not None else 0\
             for i in [v.get('size'), v.get('page'), v.get('begin'), v.get('end')]]
-        # print('Got the following shape:', shape)
         if shape not in VALID_SHAPES:
             raise ValueError(cnst.WRONG_SHAPE.format(shape))
         return v
@@ -40,7 +33,7 @@ class QueryParams(BaseModel):
     @validator('*')
     def param_positive(cls, v):
         if v is not None and v < 0:
-            raise ValueError(f'query params should be not negative, {v} got')
+            raise ValueError(f'query params shouldn\'t be negative, {v} got')
         return v
     
     @validator('size')
