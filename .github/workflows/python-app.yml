@@ -43,5 +43,5 @@ jobs:
     - name: Deploy on deta
       uses: BogDAAAMN/deta-deploy-action@v1.0.1
       with:
-        deta-access-token: ${{ secrets.DETA_PROJECT_KEY }}
+        deta-access-token: ${{ secrets.DETA_ACCESS_TOKEN }}
         deta-name: 'mockerson'
