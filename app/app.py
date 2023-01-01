@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from .api import root
 from .api import users
 from .api import fake_data
-# from .db import init_deta, shutdown_deta
 
 app = FastAPI()
 
